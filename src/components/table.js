@@ -1,31 +1,39 @@
 import React from "react";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+} from "@mui/material";
 
-const Table = ({ columns, data, onEdit, onDelete }) => {
+const ReusableTable = ({ columns, rows, onEdit, onDelete }) => {
   return (
-    <table border="1" cellPadding="10" style={{ width: "100%" }}>
-      <thead>
-        <tr>
+    <Table>
+      <TableHead>
+        <TableRow>
           {columns.map((col, index) => (
-            <th key={index}>{col}</th>
+            <TableCell key={index}>{col}</TableCell>
           ))}
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, index) => (
-          <tr key={index}>
-            {columns.map((col, colIndex) => (
-              <td key={colIndex}>{row[col.toLowerCase()]}</td>
+          <TableCell>Actions</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map((row) => (
+          <TableRow key={row.id}>
+            {columns.map((col, index) => (
+              <TableCell key={index}>{row[col]}</TableCell>
             ))}
-            <td>
-              <button onClick={() => onEdit(row)}>Edit</button>
-              <button onClick={() => onDelete(row.id)}>Delete</button>
-            </td>
-          </tr>
+            <TableCell>
+              <Button onClick={() => onEdit(row.id)}>Edit</Button>
+              <Button onClick={() => onDelete(row.id)}>Delete</Button>
+            </TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 };
 
-export default Table;
+export default ReusableTable;

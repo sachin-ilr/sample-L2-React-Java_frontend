@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
-import Table from "../components/table";
-import { fetchData, postData, deleteData } from "../service/api";
+import React, { useEffect, useState } from "react";
+import ReusableTable from "../components/table";
+import api from "../service/api";
 
 const StudentMasterPage = () => {
   const [studentMasters, setStudentMasters] = useState([]);
-  const [newStudentMaster, setNewStudentMaster] = useState({
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
     roleno: "",
@@ -12,23 +13,22 @@ const StudentMasterPage = () => {
     staffname: "",
     subjectcode: "",
   });
-  const [isAdding, setIsAdding] = useState(false);
-
-  const fetchStudentMasters = () => {
-    fetchData("/api/student-master")
-      .then((data) => setStudentMasters(data))
-      .catch((err) => console.error(err));
-  };
 
   useEffect(() => {
-    fetchStudentMasters();
+    api
+      .get("/student-master")
+      .then((res) => setStudentMasters(res.data))
+      .catch((err) => console.error(err));
   }, []);
 
-  const handleAddStudentMaster = () => {
-    postData("/api/student-master", newStudentMaster)
+  const handleAdd = () => setShowForm(true);
+
+  const handleSubmit = () => {
+    api
+      .post("/student-master", formData)
       .then(() => {
-        fetchStudentMasters();
-        setNewStudentMaster({
+        setShowForm(false);
+        setFormData({
           firstname: "",
           lastname: "",
           roleno: "",
@@ -36,82 +36,89 @@ const StudentMasterPage = () => {
           staffname: "",
           subjectcode: "",
         });
-        setIsAdding(false);
+        api.get("/student-master").then((res) => setStudentMasters(res.data)); // Refresh data
       })
       .catch((err) => console.error(err));
   };
 
-  const handleDeleteStudentMaster = (id) => {
-    deleteData(`/api/student-master/${id}`)
-      .then(() => fetchStudentMasters())
-      .catch((err) => console.error(err));
-  };
-
-  const handleInputChange = (e) => {
-    setNewStudentMaster({
-      ...newStudentMaster,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
     <div>
-      <h2>Student Master</h2>
-      {isAdding ? (
+      <h1>Student Master</h1>
+      <button onClick={handleAdd}>Add Record</button>
+      {showForm && (
         <div>
           <input
-            name="firstname"
+            type="text"
             placeholder="First Name"
-            value={newStudentMaster.firstname}
-            onChange={handleInputChange}
+            value={formData.firstname}
+            onChange={(e) =>
+              setFormData({ ...formData, firstname: e.target.value })
+            }
           />
           <input
-            name="lastname"
+            type="text"
             placeholder="Last Name"
-            value={newStudentMaster.lastname}
-            onChange={handleInputChange}
+            value={formData.lastname}
+            onChange={(e) =>
+              setFormData({ ...formData, lastname: e.target.value })
+            }
           />
           <input
-            name="roleno"
+            type="text"
             placeholder="Role No"
-            value={newStudentMaster.roleno}
-            onChange={handleInputChange}
+            value={formData.roleno}
+            onChange={(e) =>
+              setFormData({ ...formData, roleno: e.target.value })
+            }
           />
           <input
-            name="subjectname"
+            type="text"
             placeholder="Subject Name"
-            value={newStudentMaster.subjectname}
-            onChange={handleInputChange}
+            value={formData.subjectname}
+            onChange={(e) =>
+              setFormData({ ...formData, subjectname: e.target.value })
+            }
           />
           <input
-            name="staffname"
+            type="text"
             placeholder="Staff Name"
-            value={newStudentMaster.staffname}
-            onChange={handleInputChange}
+            value={formData.staffname}
+            onChange={(e) =>
+              setFormData({ ...formData, staffname: e.target.value })
+            }
           />
           <input
-            name="subjectcode"
+            type="text"
             placeholder="Subject Code"
-            value={newStudentMaster.subjectcode}
-            onChange={handleInputChange}
+            value={formData.subjectcode}
+            onChange={(e) =>
+              setFormData({ ...formData, subjectcode: e.target.value })
+            }
           />
-          <button onClick={handleAddStudentMaster}>Submit</button>
-          <button onClick={() => setIsAdding(false)}>Cancel</button>
+          <button onClick={handleSubmit}>Submit</button>
         </div>
-      ) : (
-        <button onClick={() => setIsAdding(true)}>Add Student Master</button>
       )}
-      <Table
+      <ReusableTable
         columns={[
-          "First Name",
-          "Last Name",
-          "Role No",
-          "Subject Name",
-          "Staff Name",
-          "Subject Code",
+          "firstname",
+          "lastname",
+          "roleno",
+          "subjectname",
+          "staffname",
+          "subjectcode",
         ]}
-        data={studentMasters}
-        onDelete={handleDeleteStudentMaster}
+        rows={studentMasters}
+        onEdit={(id) => console.log("Edit", id)}
+        onDelete={(id) => {
+          api
+            .delete(`/student-master/${id}`)
+            .then(() =>
+              api
+                .get("/student-master")
+                .then((res) => setStudentMasters(res.data))
+            )
+            .catch((err) => console.error(err));
+        }}
       />
     </div>
   );

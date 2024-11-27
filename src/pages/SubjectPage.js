@@ -1,83 +1,102 @@
-import React, { useState, useEffect } from "react";
-import Table from "../components/table";
-import { fetchData, postData, deleteData } from "../service/api";
+import React, { useEffect, useState } from "react";
+import ReusableTable from "../components/table";
+import api from "../service/api";
 
 const SubjectPage = () => {
   const [subjects, setSubjects] = useState([]);
-  const [newSubject, setNewSubject] = useState({
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
     name: "",
     staffname: "",
     subjectcode: "",
   });
-  const [isAdding, setIsAdding] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchSubjects = () => {
-    fetchData("/api/subjects")
-      .then((data) => setSubjects(data))
-      .catch((err) => console.error(err));
+    api
+      .get("/subjects")
+      .then((res) => setSubjects(res.data))
+      .catch((err) => setError("Failed to fetch subjects"));
   };
 
   useEffect(() => {
     fetchSubjects();
   }, []);
 
-  const handleAddSubject = () => {
-    postData("/api/subjects", newSubject)
+  const handleAdd = () => setShowForm(true);
+
+  const validateForm = () => {
+    return (
+      formData.name.trim() &&
+      formData.staffname.trim() &&
+      formData.subjectcode.trim()
+    );
+  };
+
+  const handleSubmit = () => {
+    if (!validateForm()) {
+      setError("Please fill in all fields");
+      return;
+    }
+
+    api
+      .post("/subjects", formData)
       .then(() => {
+        setShowForm(false);
+        setFormData({ name: "", staffname: "", subjectcode: "" });
         fetchSubjects();
-        setNewSubject({
-          name: "",
-          staffname: "",
-          subjectcode: "",
-        });
-        setIsAdding(false);
+        setError(null);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => setError("Failed to add subject"));
   };
 
-  const handleDeleteSubject = (id) => {
-    deleteData(`/api/subjects/${id}`)
-      .then(() => fetchSubjects())
-      .catch((err) => console.error(err));
-  };
-
-  const handleInputChange = (e) => {
-    setNewSubject({ ...newSubject, [e.target.name]: e.target.value });
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setError(null);
   };
 
   return (
-    <div>
-      <h2>Subjects</h2>
-      {isAdding ? (
-        <div>
+    <div className="subject-page">
+      <h1>Subjects</h1>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <button onClick={handleAdd}>Add Subject</button>
+
+      {showForm && (
+        <div className="subject-form">
           <input
-            name="name"
+            type="text"
             placeholder="Name"
-            value={newSubject.name}
-            onChange={handleInputChange}
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
           />
           <input
-            name="staffname"
+            type="text"
             placeholder="Staff Name"
-            value={newSubject.staffname}
-            onChange={handleInputChange}
+            value={formData.staffname}
+            onChange={(e) => handleInputChange("staffname", e.target.value)}
           />
           <input
-            name="subjectcode"
+            type="text"
             placeholder="Subject Code"
-            value={newSubject.subjectcode}
-            onChange={handleInputChange}
+            value={formData.subjectcode}
+            onChange={(e) => handleInputChange("subjectcode", e.target.value)}
           />
-          <button onClick={handleAddSubject}>Submit</button>
-          <button onClick={() => setIsAdding(false)}>Cancel</button>
+          <button onClick={handleSubmit}>Submit</button>
         </div>
-      ) : (
-        <button onClick={() => setIsAdding(true)}>Add Subject</button>
       )}
-      <Table
-        columns={["Name", "Staff Name", "Subject Code"]}
-        data={subjects}
-        onDelete={handleDeleteSubject}
+
+      <ReusableTable
+        columns={["name", "staffname", "subjectcode"]}
+        rows={subjects}
+        onEdit={(id) => console.log("Edit", id)}
+        onDelete={(id) => {
+          api
+            .delete(`/subjects/${id}`)
+            .then(() => fetchSubjects())
+            .catch((err) => setError("Failed to delete subject"));
+        }}
       />
     </div>
   );

@@ -1,91 +1,86 @@
-import React, { useState, useEffect } from "react";
-import Table from "../components/table";
-import { fetchData, postData, deleteData } from "../service/api";
+import React, { useEffect, useState } from "react";
+import ReusableTable from "../components/table";
+import api from "../service/api";
 
 const StaffPage = () => {
   const [staff, setStaff] = useState([]);
-  const [newStaff, setNewStaff] = useState({
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
     name: "",
     mobileno: "",
     address: "",
     subjectexpert: "",
   });
-  const [isAdding, setIsAdding] = useState(false);
-
-  const fetchStaff = () => {
-    fetchData("/api/staff")
-      .then((data) => setStaff(data))
-      .catch((err) => console.error(err));
-  };
 
   useEffect(() => {
-    fetchStaff();
+    api
+      .get("/staff")
+      .then((res) => setStaff(res.data))
+      .catch((err) => console.error(err));
   }, []);
 
-  const handleAddStaff = () => {
-    postData("/api/staff", newStaff)
+  const handleAdd = () => setShowForm(true);
+
+  const handleSubmit = () => {
+    api
+      .post("/staff", formData)
       .then(() => {
-        fetchStaff();
-        setNewStaff({
-          name: "",
-          mobileno: "",
-          address: "",
-          subjectexpert: "",
-        });
-        setIsAdding(false);
+        setShowForm(false);
+        setFormData({ name: "", mobileno: "", address: "", subjectexpert: "" });
+        api.get("/staff").then((res) => setStaff(res.data)); // Refresh data
       })
       .catch((err) => console.error(err));
   };
 
-  const handleDeleteStaff = (id) => {
-    deleteData(`/api/staff/${id}`)
-      .then(() => fetchStaff())
-      .catch((err) => console.error(err));
-  };
-
-  const handleInputChange = (e) => {
-    setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
-  };
-
   return (
     <div>
-      <h2>Staff</h2>
-      {isAdding ? (
+      <h1>Staff</h1>
+      <button onClick={handleAdd}>Add Staff</button>
+      {showForm && (
         <div>
           <input
-            name="name"
+            type="text"
             placeholder="Name"
-            value={newStaff.name}
-            onChange={handleInputChange}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
           <input
-            name="mobileno"
+            type="text"
             placeholder="Mobile No"
-            value={newStaff.mobileno}
-            onChange={handleInputChange}
+            value={formData.mobileno}
+            onChange={(e) =>
+              setFormData({ ...formData, mobileno: e.target.value })
+            }
           />
           <input
-            name="address"
+            type="text"
             placeholder="Address"
-            value={newStaff.address}
-            onChange={handleInputChange}
+            value={formData.address}
+            onChange={(e) =>
+              setFormData({ ...formData, address: e.target.value })
+            }
           />
           <input
-            name="subjectexpert"
+            type="text"
             placeholder="Subject Expert"
-            value={newStaff.subjectexpert}
-            onChange={handleInputChange}
+            value={formData.subjectexpert}
+            onChange={(e) =>
+              setFormData({ ...formData, subjectexpert: e.target.value })
+            }
           />
-          <button onClick={handleAddStaff}>Submit</button>
-          <button onClick={() => setIsAdding(false)}>Cancel</button>
+          <button onClick={handleSubmit}>Submit</button>
         </div>
-      ) : (
-        <button onClick={() => setIsAdding(true)}>Add Staff</button>
       )}
-      <Table
-        columns={["Name", "Mobile No", "Address", "Subject Expert"]}
-        data={staff}
-        onDelete={handleDeleteStaff}
+      <ReusableTable
+        columns={["name", "mobileno", "address", "subjectexpert"]}
+        rows={staff}
+        onEdit={(id) => console.log("Edit", id)}
+        onDelete={(id) => {
+          api
+            .delete(`/staff/${id}`)
+            .then(() => api.get("/staff").then((res) => setStaff(res.data)))
+            .catch((err) => console.error(err));
+        }}
       />
     </div>
   );
