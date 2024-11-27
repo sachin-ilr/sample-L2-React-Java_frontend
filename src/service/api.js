@@ -1,31 +1,43 @@
-const BASE_URL = "http://localhost:8080"; // Update this to your backend's URL
+import axios from "axios";
 
-// Utility function to handle API calls
-const apiRequest = async (endpoint, method = "GET", body = null) => {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+const BASE_URL = "http://localhost:8080"; // Your backend URL
 
+export const fetchData = async (endpoint) => {
   try {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : null,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-
-    return await response.json();
+    const response = await axios.get(`${BASE_URL}/${endpoint}`);
+    return response.data;
   } catch (error) {
-    console.error("API Request Failed:", error);
+    console.error("Error fetching data:", error);
     throw error;
   }
 };
 
-// Example API methods
-export const fetchData = (endpoint) => apiRequest(endpoint);
-export const postData = (endpoint, data) => apiRequest(endpoint, "POST", data);
-export const deleteData = (endpoint) => apiRequest(endpoint, "DELETE");
-export const updateData = (endpoint, data) => apiRequest(endpoint, "PUT");
+export const postData = async (endpoint, data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/${endpoint}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error posting data:", error);
+    throw error;
+  }
+};
+
+export const updateData = async (endpoint, id, data) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/${endpoint}/${id}`, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating data:", error);
+    throw error;
+  }
+};
+
+export const deleteData = async (endpoint, id) => {
+  try {
+    const response = await axios.delete(`${BASE_URL}/${endpoint}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting data:", error);
+    throw error;
+  }
+};

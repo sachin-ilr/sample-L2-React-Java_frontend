@@ -1,86 +1,30 @@
 import React, { useEffect, useState } from "react";
-import ReusableTable from "../components/table";
-import api from "../service/api";
+import { fetchData, deleteData, updateData } from "../service/api";
+import Table from "../components/Table"; // Import the Table component
 
 const StaffPage = () => {
-  const [staff, setStaff] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    mobileno: "",
-    address: "",
-    subjectexpert: "",
-  });
+  const [staffData, setStaffData] = useState([]);
 
   useEffect(() => {
-    api
-      .get("/staff")
-      .then((res) => setStaff(res.data))
-      .catch((err) => console.error(err));
+    fetchData("staff")
+      .then((response) => setStaffData(response))
+      .catch((error) => console.log("Error fetching staff data:", error));
   }, []);
 
-  const handleAdd = () => setShowForm(true);
-
-  const handleSubmit = () => {
-    api
-      .post("/staff", formData)
-      .then(() => {
-        setShowForm(false);
-        setFormData({ name: "", mobileno: "", address: "", subjectexpert: "" });
-        api.get("/staff").then((res) => setStaff(res.data)); // Refresh data
-      })
-      .catch((err) => console.error(err));
+  const handleDelete = (id) => {
+    deleteData("staff", id)
+      .then(() => setStaffData(staffData.filter((staff) => staff.id !== id)))
+      .catch((error) => console.log("Error deleting staff:", error));
   };
 
   return (
     <div>
-      <h1>Staff</h1>
-      <button onClick={handleAdd}>Add Staff</button>
-      {showForm && (
-        <div>
-          <input
-            type="text"
-            placeholder="Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Mobile No"
-            value={formData.mobileno}
-            onChange={(e) =>
-              setFormData({ ...formData, mobileno: e.target.value })
-            }
-          />
-          <input
-            type="text"
-            placeholder="Address"
-            value={formData.address}
-            onChange={(e) =>
-              setFormData({ ...formData, address: e.target.value })
-            }
-          />
-          <input
-            type="text"
-            placeholder="Subject Expert"
-            value={formData.subjectexpert}
-            onChange={(e) =>
-              setFormData({ ...formData, subjectexpert: e.target.value })
-            }
-          />
-          <button onClick={handleSubmit}>Submit</button>
-        </div>
-      )}
-      <ReusableTable
-        columns={["name", "mobileno", "address", "subjectexpert"]}
-        rows={staff}
-        onEdit={(id) => console.log("Edit", id)}
-        onDelete={(id) => {
-          api
-            .delete(`/staff/${id}`)
-            .then(() => api.get("/staff").then((res) => setStaff(res.data)))
-            .catch((err) => console.error(err));
-        }}
+      <h2>Staff Page</h2>
+      <Table
+        data={staffData}
+        columns={["Name", "Mobile No.", "Address", "Subject Expertise"]}
+        handleDelete={handleDelete}
+        handleUpdate={updateData}
       />
     </div>
   );
