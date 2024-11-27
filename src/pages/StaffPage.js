@@ -4,7 +4,12 @@ import { fetchData, postData, deleteData } from "../service/api";
 
 const StaffPage = () => {
   const [staff, setStaff] = useState([]);
-  const [newStaff, setNewStaff] = useState({ name: "", position: "" });
+  const [newStaff, setNewStaff] = useState({
+    name: "",
+    mobileno: "",
+    address: "",
+    subjectexpert: "",
+  });
   const [isAdding, setIsAdding] = useState(false);
 
   const fetchStaff = () => {
@@ -21,7 +26,12 @@ const StaffPage = () => {
     postData("/api/staff", newStaff)
       .then(() => {
         fetchStaff();
-        setNewStaff({ name: "", position: "" });
+        setNewStaff({
+          name: "",
+          mobileno: "",
+          address: "",
+          subjectexpert: "",
+        });
         setIsAdding(false);
       })
       .catch((err) => console.error(err));
@@ -39,19 +49,31 @@ const StaffPage = () => {
 
   return (
     <div>
-      <h2>Staff Page</h2>
+      <h2>Staff</h2>
       {isAdding ? (
         <div>
           <input
             name="name"
-            placeholder="Staff Name"
+            placeholder="Name"
             value={newStaff.name}
             onChange={handleInputChange}
           />
           <input
-            name="position"
-            placeholder="Position"
-            value={newStaff.position}
+            name="mobileno"
+            placeholder="Mobile No"
+            value={newStaff.mobileno}
+            onChange={handleInputChange}
+          />
+          <input
+            name="address"
+            placeholder="Address"
+            value={newStaff.address}
+            onChange={handleInputChange}
+          />
+          <input
+            name="subjectexpert"
+            placeholder="Subject Expert"
+            value={newStaff.subjectexpert}
             onChange={handleInputChange}
           />
           <button onClick={handleAddStaff}>Submit</button>
@@ -61,9 +83,8 @@ const StaffPage = () => {
         <button onClick={() => setIsAdding(true)}>Add Staff</button>
       )}
       <Table
-        columns={["Name", "Position"]}
+        columns={["Name", "Mobile No", "Address", "Subject Expert"]}
         data={staff}
-        onEdit={(staffMember) => console.log("Edit", staffMember)}
         onDelete={handleDeleteStaff}
       />
     </div>

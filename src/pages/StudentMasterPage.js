@@ -5,9 +5,12 @@ import { fetchData, postData, deleteData } from "../service/api";
 const StudentMasterPage = () => {
   const [studentMasters, setStudentMasters] = useState([]);
   const [newStudentMaster, setNewStudentMaster] = useState({
-    id: "",
-    name: "",
-    details: "",
+    firstname: "",
+    lastname: "",
+    roleno: "",
+    subjectname: "",
+    staffname: "",
+    subjectcode: "",
   });
   const [isAdding, setIsAdding] = useState(false);
 
@@ -25,7 +28,14 @@ const StudentMasterPage = () => {
     postData("/api/student-master", newStudentMaster)
       .then(() => {
         fetchStudentMasters();
-        setNewStudentMaster({ id: "", name: "", details: "" });
+        setNewStudentMaster({
+          firstname: "",
+          lastname: "",
+          roleno: "",
+          subjectname: "",
+          staffname: "",
+          subjectcode: "",
+        });
         setIsAdding(false);
       })
       .catch((err) => console.error(err));
@@ -46,37 +56,61 @@ const StudentMasterPage = () => {
 
   return (
     <div>
-      <h2>Student Master Page</h2>
+      <h2>Student Master</h2>
       {isAdding ? (
         <div>
           <input
-            name="id"
-            placeholder="ID"
-            value={newStudentMaster.id}
+            name="firstname"
+            placeholder="First Name"
+            value={newStudentMaster.firstname}
             onChange={handleInputChange}
           />
           <input
-            name="name"
-            placeholder="Name"
-            value={newStudentMaster.name}
+            name="lastname"
+            placeholder="Last Name"
+            value={newStudentMaster.lastname}
             onChange={handleInputChange}
           />
           <input
-            name="details"
-            placeholder="Details"
-            value={newStudentMaster.details}
+            name="roleno"
+            placeholder="Role No"
+            value={newStudentMaster.roleno}
+            onChange={handleInputChange}
+          />
+          <input
+            name="subjectname"
+            placeholder="Subject Name"
+            value={newStudentMaster.subjectname}
+            onChange={handleInputChange}
+          />
+          <input
+            name="staffname"
+            placeholder="Staff Name"
+            value={newStudentMaster.staffname}
+            onChange={handleInputChange}
+          />
+          <input
+            name="subjectcode"
+            placeholder="Subject Code"
+            value={newStudentMaster.subjectcode}
             onChange={handleInputChange}
           />
           <button onClick={handleAddStudentMaster}>Submit</button>
           <button onClick={() => setIsAdding(false)}>Cancel</button>
         </div>
       ) : (
-        <button onClick={() => setIsAdding(true)}>Add Record</button>
+        <button onClick={() => setIsAdding(true)}>Add Student Master</button>
       )}
       <Table
-        columns={["ID", "Name", "Details"]}
+        columns={[
+          "First Name",
+          "Last Name",
+          "Role No",
+          "Subject Name",
+          "Staff Name",
+          "Subject Code",
+        ]}
         data={studentMasters}
-        onEdit={(studentMaster) => console.log("Edit", studentMaster)}
         onDelete={handleDeleteStudentMaster}
       />
     </div>

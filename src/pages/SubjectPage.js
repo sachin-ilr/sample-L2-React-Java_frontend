@@ -4,7 +4,11 @@ import { fetchData, postData, deleteData } from "../service/api";
 
 const SubjectPage = () => {
   const [subjects, setSubjects] = useState([]);
-  const [newSubject, setNewSubject] = useState({ name: "", code: "" });
+  const [newSubject, setNewSubject] = useState({
+    name: "",
+    staffname: "",
+    subjectcode: "",
+  });
   const [isAdding, setIsAdding] = useState(false);
 
   const fetchSubjects = () => {
@@ -21,7 +25,11 @@ const SubjectPage = () => {
     postData("/api/subjects", newSubject)
       .then(() => {
         fetchSubjects();
-        setNewSubject({ name: "", code: "" });
+        setNewSubject({
+          name: "",
+          staffname: "",
+          subjectcode: "",
+        });
         setIsAdding(false);
       })
       .catch((err) => console.error(err));
@@ -39,19 +47,25 @@ const SubjectPage = () => {
 
   return (
     <div>
-      <h2>Subject Page</h2>
+      <h2>Subjects</h2>
       {isAdding ? (
         <div>
           <input
             name="name"
-            placeholder="Subject Name"
+            placeholder="Name"
             value={newSubject.name}
             onChange={handleInputChange}
           />
           <input
-            name="code"
+            name="staffname"
+            placeholder="Staff Name"
+            value={newSubject.staffname}
+            onChange={handleInputChange}
+          />
+          <input
+            name="subjectcode"
             placeholder="Subject Code"
-            value={newSubject.code}
+            value={newSubject.subjectcode}
             onChange={handleInputChange}
           />
           <button onClick={handleAddSubject}>Submit</button>
@@ -61,9 +75,8 @@ const SubjectPage = () => {
         <button onClick={() => setIsAdding(true)}>Add Subject</button>
       )}
       <Table
-        columns={["Name", "Code"]}
+        columns={["Name", "Staff Name", "Subject Code"]}
         data={subjects}
-        onEdit={(subject) => console.log("Edit", subject)}
         onDelete={handleDeleteSubject}
       />
     </div>
