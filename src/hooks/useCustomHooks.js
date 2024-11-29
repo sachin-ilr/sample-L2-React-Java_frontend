@@ -1,13 +1,26 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
-const useCustomHook = () => {
-  const [data, setData] = useState(null);
+const useCustomHook = (endpoint) => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Logic for fetching or managing data
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(endpoint);
+        setData(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || "Error occurred while fetching data");
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [endpoint]);
 
-  return data;
+  return { data, loading, error };
 };
 
 export default useCustomHook;
