@@ -1,33 +1,51 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import "./styles/Sidebar.css";
 
 const Sidebar = () => {
   return (
-    <aside style={{ width: "200px", background: "#f4f4f4", padding: "10px" }}>
+    <aside className="sidebar">
       <nav>
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <h2>Dashboard</h2>
+        <ul>
           <li>
-            <NavLink to="/" style={{ textDecoration: "none" }}>
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Home
             </NavLink>
           </li>
           <li>
-            <NavLink to="/students" style={{ textDecoration: "none" }}>
+            <NavLink
+              to="/students"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Students
             </NavLink>
           </li>
           <li>
-            <NavLink to="/subjects" style={{ textDecoration: "none" }}>
+            <NavLink
+              to="/subjects"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Subjects
             </NavLink>
           </li>
           <li>
-            <NavLink to="/staff" style={{ textDecoration: "none" }}>
+            <NavLink
+              to="/staff"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Staff
             </NavLink>
           </li>
           <li>
-            <NavLink to="/student-master" style={{ textDecoration: "none" }}>
+            <NavLink
+              to="/student-master"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Student Master
             </NavLink>
           </li>

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {
   Table,
   TableHead,
@@ -23,7 +24,9 @@ const ReusableTable = ({ columns, rows, onEdit, onDelete }) => {
         {rows.map((row) => (
           <TableRow key={row.id}>
             {columns.map((col, index) => (
-              <TableCell key={index}>{row[col]}</TableCell>
+              <TableCell key={index}>
+                {row[col.toLowerCase().replace(/ /g, "_")]}
+              </TableCell>
             ))}
             <TableCell>
               <Button onClick={() => onEdit(row.id)}>Edit</Button>
@@ -34,6 +37,13 @@ const ReusableTable = ({ columns, rows, onEdit, onDelete }) => {
       </TableBody>
     </Table>
   );
+};
+
+ReusableTable.propTypes = {
+  columns: PropTypes.arrayOf(PropTypes.string).isRequired,
+  rows: PropTypes.arrayOf(PropTypes.object).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default ReusableTable;
