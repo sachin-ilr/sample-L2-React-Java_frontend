@@ -11,8 +11,8 @@ const SubjectPage = () => {
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    staffname: "",
-    subjectcode: "",
+    staffName: "",
+    subjectCode: "",
   });
 
   useEffect(() => {
@@ -103,5 +103,4 @@ const SubjectPage = () => {
     </div>
   );
 };
-
 export default SubjectPage;

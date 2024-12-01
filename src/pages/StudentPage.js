@@ -26,7 +26,7 @@ const StudentPage = () => {
     setIsLoading(true);
     try {
       const data = await fetchData("students");
-      setStudentsData(data.content); // Assuming the API returns paginated data
+      setStudentsData(data.content);
       setError(null);
     } catch (err) {
       setError("Failed to load students data. Please try again later.");
@@ -62,11 +62,11 @@ const StudentPage = () => {
       const response = await postData("students", data);
       setStudentsData([...studentsData, response]);
       setFormData({
-        firstname: "",
-        lastname: "",
-        mobileno: "",
-        roleno: "",
-        classname: "",
+        firstName: "",
+        lastName: "",
+        mobileNo: "",
+        roleNo: "",
+        className: "",
         address: "",
       });
       setError(null);
