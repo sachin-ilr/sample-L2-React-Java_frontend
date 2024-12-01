@@ -11,8 +11,8 @@ const SubjectPage = () => {
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    staffName: "",
-    subjectCode: "",
+    staffname: "",
+    subjectcode: "",
   });
 
   useEffect(() => {

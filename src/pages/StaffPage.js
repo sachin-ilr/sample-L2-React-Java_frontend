@@ -61,9 +61,9 @@ const StaffPage = () => {
       setStaffData([...staffData, response]);
       setFormData({
         name: "",
-        mobileNo: "",
+        mobileno: "",
         address: "",
-        subjectExpert: "",
+        subjectexpert: "",
       });
       setError(null);
     } catch (err) {

@@ -62,11 +62,11 @@ const StudentPage = () => {
       const response = await postData("students", data);
       setStudentsData([...studentsData, response]);
       setFormData({
-        firstName: "",
-        lastName: "",
-        mobileNo: "",
-        roleNo: "",
-        className: "",
+        firstname: "",
+        lastname: "",
+        mobileno: "",
+        roleno: "",
+        classname: "",
         address: "",
       });
       setError(null);
