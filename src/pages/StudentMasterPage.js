@@ -10,7 +10,7 @@ const StudentMasterPage = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    fetchData("student_master")
+    fetchData("student-master/all")
       .then((response) => {
         setStudentsMasterData(response);
         setIsLoading(false);
@@ -23,7 +23,7 @@ const StudentMasterPage = () => {
   }, []);
 
   const handleDelete = (id) => {
-    deleteData("student_master", id)
+    deleteData("student-master", id)
       .then(() => {
         setStudentsMasterData(
           studentsMasterData.filter((student) => student.id !== id)
@@ -36,7 +36,7 @@ const StudentMasterPage = () => {
   };
 
   const handleEdit = (id, updatedData) => {
-    updateData("student_master", id, updatedData)
+    updateData("student-master", id, updatedData)
       .then((response) => {
         setStudentsMasterData(
           studentsMasterData.map((student) =>

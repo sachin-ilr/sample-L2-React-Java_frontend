@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchData, deleteData, updateData, postData } from "../service/api";
+import { fetchData, postData, updateData, deleteData } from "../service/api";
 import ReusableTable from "../components/ReusableTable";
 import ReusableForm from "../components/ReusableForm";
 import ErrorMessage from "../components/ErrorMessage";
@@ -11,85 +11,77 @@ const StaffPage = () => {
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
-    mobile_no: "",
+    mobileNo: "",
     address: "",
-    subject_expertise: "",
+    subjectExpert: "",
   });
 
   useEffect(() => {
     fetchStaffData();
   }, []);
 
-  const fetchStaffData = () => {
+  const fetchStaffData = async () => {
     setIsLoading(true);
-    fetchData("staff")
-      .then((response) => {
-        setStaffData(response);
-        setIsLoading(false);
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("Error fetching staff data:", error);
-        setError("Failed to load staff data. Please try again later.");
-        setIsLoading(false);
-      });
+    try {
+      const data = await fetchData("staff");
+      setStaffData(data.content);
+      setError(null);
+    } catch (err) {
+      setError("Failed to load staff data. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    deleteData("staff", id)
-      .then(() => {
-        setStaffData(staffData.filter((staff) => staff.id !== id));
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("Error deleting staff:", error);
-        setError("Failed to delete staff. Please try again.");
-      });
+  const handleDelete = async (id) => {
+    try {
+      await deleteData("staff", id);
+      setStaffData(staffData.filter((staff) => staff.id !== id));
+      setError(null);
+    } catch (err) {
+      setError("Failed to delete staff. Please try again.");
+    }
   };
 
-  const handleEdit = (id, updatedData) => {
-    updateData("staff", id, updatedData)
-      .then((response) => {
-        setStaffData(
-          staffData.map((staff) => (staff.id === id ? response : staff))
-        );
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("Error updating staff:", error);
-        setError("Failed to update staff. Please try again.");
-      });
+  const handleEdit = async (id, updatedData) => {
+    try {
+      const response = await updateData("staff", id, updatedData);
+      setStaffData(
+        staffData.map((staff) => (staff.id === id ? response : staff))
+      );
+      setError(null);
+    } catch (err) {
+      setError("Failed to update staff. Please try again.");
+    }
   };
 
-  const handleSubmit = (data) => {
-    postData("staff", data)
-      .then((response) => {
-        setStaffData([...staffData, response]);
-        setFormData({
-          name: "",
-          mobile_no: "",
-          address: "",
-          subject_expertise: "",
-        });
-        setError(null);
-      })
-      .catch((error) => {
-        console.error("Error adding staff:", error);
-        setError("Failed to add staff. Please try again.");
+  const handleSubmit = async (data) => {
+    try {
+      const response = await postData("staff", data);
+      setStaffData([...staffData, response]);
+      setFormData({
+        name: "",
+        mobileNo: "",
+        address: "",
+        subjectExpert: "",
       });
+      setError(null);
+    } catch (err) {
+      setError("Failed to add staff. Please try again.");
+    }
   };
 
   const formFields = [
     { name: "name", label: "Name", required: true },
-    { name: "mobile_no", label: "Mobile No.", required: true },
-    { name: "address", label: "Address", required: true },
-    { name: "subject_expertise", label: "Subject Expertise", required: true },
+    { name: "mobileNo", label: "Mobile No.", required: true },
+    { name: "address", label: "Address", required: false },
+    { name: "subjectExpert", label: "Subject Expertise", required: true },
   ];
 
   return (
     <div className="page-container">
       <h2 className="page-title">Staff Page</h2>
-      {error && <ErrorMessage message={error} className="error-message" />}
+      {error && <ErrorMessage message={error} />}
 
       <h3 className="section-title">Add New Staff</h3>
       <ReusableForm
