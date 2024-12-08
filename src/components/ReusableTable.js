@@ -24,9 +24,7 @@ const ReusableTable = ({ columns, rows, onEdit, onDelete }) => {
         {rows.map((row) => (
           <TableRow key={row.id}>
             {columns.map((col, index) => (
-              <TableCell key={index}>
-                {row[col.toLowerCase().replace(/ /g, "_")]}
-              </TableCell>
+              <TableCell key={index}>{row[col]}</TableCell>
             ))}
             <TableCell>
               <Button onClick={() => onEdit(row.id)}>Edit</Button>

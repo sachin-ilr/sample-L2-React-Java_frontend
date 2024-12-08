@@ -104,12 +104,12 @@ const StudentPage = () => {
       ) : (
         <ReusableTable
           columns={[
-            "First Name",
-            "Last Name",
-            "Mobile No.",
-            "Role No.",
-            "Class Name",
-            "Address",
+            "firstName",
+            "lastName",
+            "mobileNo",
+            "roleNo",
+            "className",
+            "address",
           ]}
           rows={studentsData}
           onEdit={handleEdit}

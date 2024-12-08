@@ -94,7 +94,7 @@ const SubjectPage = () => {
         <p className="loading-message">Loading...</p>
       ) : (
         <ReusableTable
-          columns={["Subject Name", "Staff Name", "Subject Code"]}
+          columns={["name", "staffName", "subjectCode"]}
           rows={subjectsData}
           onEdit={handleEdit}
           onDelete={handleDelete}

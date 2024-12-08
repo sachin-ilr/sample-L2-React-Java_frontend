@@ -97,7 +97,7 @@ const StaffPage = () => {
         <p className="loading-message">Loading...</p>
       ) : (
         <ReusableTable
-          columns={["Name", "Mobile No.", "Address", "Subject Expertise"]}
+          columns={["name", "mobileNo", "address", "subjectExpert"]}
           rows={staffData}
           onEdit={handleEdit}
           onDelete={handleDelete}
