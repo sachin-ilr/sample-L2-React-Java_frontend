@@ -1,7 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { fetchData, deleteData, updateData } from "../service/api";
-import ReusableTable from "../components/ReusableTable";
-import ErrorMessage from "../components/ErrorMessage";
+import {
+  Container,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  CircularProgress,
+} from "@mui/material";
 
 const StudentMasterPage = () => {
   const [studentsMasterData, setStudentsMasterData] = useState([]);
@@ -9,66 +20,91 @@ const StudentMasterPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetchData("student-master/all")
-      .then((response) => {
-        setStudentsMasterData(response);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching student master data:", error);
-        setError("Failed to load student master data. Please try again later.");
-        setIsLoading(false);
-      });
+    fetchStudentMasterData();
   }, []);
 
-  const handleDelete = (id) => {
-    deleteData("student-master", id)
-      .then(() => {
-        setStudentsMasterData(
-          studentsMasterData.filter((student) => student.id !== id)
-        );
-      })
-      .catch((error) => {
-        console.error("Error deleting student master:", error);
-        setError("Failed to delete student master. Please try again.");
-      });
+  const fetchStudentMasterData = async () => {
+    setIsLoading(true);
+    try {
+      const data = await fetchData("student-master");
+      setStudentsMasterData(data.content);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching student master data:", err);
+      setError("Failed to load student master data. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEdit = (id, updatedData) => {
-    updateData("student-master", id, updatedData)
-      .then((response) => {
-        setStudentsMasterData(
-          studentsMasterData.map((student) =>
-            student.id === id ? response : student
-          )
-        );
-      })
-      .catch((error) => {
-        console.error("Error updating student master:", error);
-        setError("Failed to update student master. Please try again.");
-      });
+  const handleDelete = async (id) => {
+    try {
+      await deleteData("student-master", id);
+      setStudentsMasterData(
+        studentsMasterData.filter((student) => student.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting student master:", error);
+      setError("Failed to delete student master. Please try again.");
+    }
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <ErrorMessage message={error} />;
+  const handleEdit = async (id, updatedData) => {
+    try {
+      const response = await updateData("student-master", id, updatedData);
+      setStudentsMasterData(
+        studentsMasterData.map((student) =>
+          student.id === id ? response : student
+        )
+      );
+    } catch (error) {
+      console.error("Error updating student master:", error);
+      setError("Failed to update student master. Please try again.");
+    }
+  };
+
+  if (isLoading) return <CircularProgress />;
+  if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <div>
-      <h2>Student Master Page</h2>
-      <ReusableTable
-        columns={[
-          "First Name",
-          "Last Name",
-          "Role No.",
-          "Subject Name",
-          "Staff Name",
-        ]}
-        rows={studentsMasterData}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-    </div>
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Student Master Page
+      </Typography>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
+              <TableCell>Role No.</TableCell>
+              <TableCell>Subject Name</TableCell>
+              <TableCell>Staff Name</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {studentsMasterData.map((student) => (
+              <TableRow key={student.id}>
+                <TableCell>{student.firstName}</TableCell>
+                <TableCell>{student.lastName}</TableCell>
+                <TableCell>{student.roleNo}</TableCell>
+                <TableCell>{student.subjectName}</TableCell>
+                <TableCell>{student.staffName}</TableCell>
+                <TableCell>
+                  <Button onClick={() => handleEdit(student.id, student)}>
+                    Edit
+                  </Button>
+                  <Button onClick={() => handleDelete(student.id)}>
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 };
 

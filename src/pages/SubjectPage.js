@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { fetchData, postData, updateData, deleteData } from "../service/api";
-import ReusableTable from "../components/ReusableTable";
-import ReusableForm from "../components/ReusableForm";
-import ErrorMessage from "../components/ErrorMessage";
-import "./styles/SubjectPage.css";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 
 const SubjectPage = () => {
   const [subjectsData, setSubjectsData] = useState([]);
@@ -54,9 +65,10 @@ const SubjectPage = () => {
     }
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await postData("subjects", data);
+      const response = await postData("subjects", formData);
       setSubjectsData([...subjectsData, response]);
       setFormData({
         name: "",
@@ -69,38 +81,97 @@ const SubjectPage = () => {
     }
   };
 
-  const formFields = [
-    { name: "name", label: "Subject Name", required: true },
-    { name: "staffName", label: "Staff Name", required: true },
-    { name: "subjectCode", label: "Subject Code", required: false },
-  ];
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   return (
-    <div className="page-container">
-      <h2 className="page-title">Subject Page</h2>
-      {error && <ErrorMessage message={error} />}
-
-      <h3 className="section-title">Add New Subject</h3>
-      <ReusableForm
-        fields={formFields}
-        onSubmit={handleSubmit}
-        formData={formData}
-        setFormData={setFormData}
-        submitButtonText="Add Subject"
-      />
-
-      <h3 className="section-title">Subjects List</h3>
-      {isLoading ? (
-        <p className="loading-message">Loading...</p>
-      ) : (
-        <ReusableTable
-          columns={["name", "staffName", "subjectCode"]}
-          rows={subjectsData}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Subject Page
+      </Typography>
+      {error && (
+        <Typography color="error" gutterBottom>
+          {error}
+        </Typography>
       )}
-    </div>
+
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="name"
+          label="Subject Name"
+          value={formData.name}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="staffName"
+          label="Staff Name"
+          value={formData.staffName}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          fullWidth
+          name="subjectCode"
+          label="Subject Code"
+          value={formData.subjectCode}
+          onChange={handleInputChange}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Add Subject
+        </Button>
+      </Box>
+
+      <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+        Subjects List
+      </Typography>
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Subject Name</TableCell>
+                <TableCell>Staff Name</TableCell>
+                <TableCell>Subject Code</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {subjectsData.map((subject) => (
+                <TableRow key={subject.id}>
+                  <TableCell>{subject.name}</TableCell>
+                  <TableCell>{subject.staffName}</TableCell>
+                  <TableCell>{subject.subjectCode}</TableCell>
+                  <TableCell>
+                    <Button onClick={() => handleEdit(subject.id, subject)}>
+                      Edit
+                    </Button>
+                    <Button onClick={() => handleDelete(subject.id)}>
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Container>
   );
 };
+
 export default SubjectPage;

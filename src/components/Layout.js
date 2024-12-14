@@ -1,16 +1,18 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import { Box } from "@mui/material";
+import Header from "./Header";
 import Sidebar from "./Sidebar";
-import "./styles/Layout.css";
 
 const Layout = () => {
   return (
-    <div className="layout">
+    <Box sx={{ display: "flex" }}>
+      <Header />
       <Sidebar />
-      <main className="main-content">
+      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8, ml: 30 }}>
         <Outlet />
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

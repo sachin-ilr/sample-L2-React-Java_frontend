@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { fetchData, postData, updateData, deleteData } from "../service/api";
-import ReusableTable from "../components/ReusableTable";
-import ReusableForm from "../components/ReusableForm";
-import ErrorMessage from "../components/ErrorMessage";
-import "./styles/StaffPage.css";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 
 const StaffPage = () => {
   const [staffData, setStaffData] = useState([]);
@@ -55,9 +66,10 @@ const StaffPage = () => {
     }
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await postData("staff", data);
+      const response = await postData("staff", formData);
       setStaffData([...staffData, response]);
       setFormData({
         name: "",
@@ -71,39 +83,107 @@ const StaffPage = () => {
     }
   };
 
-  const formFields = [
-    { name: "name", label: "Name", required: true },
-    { name: "mobileNo", label: "Mobile No.", required: true },
-    { name: "address", label: "Address", required: false },
-    { name: "subjectExpert", label: "Subject Expertise", required: true },
-  ];
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   return (
-    <div className="page-container">
-      <h2 className="page-title">Staff Page</h2>
-      {error && <ErrorMessage message={error} />}
-
-      <h3 className="section-title">Add New Staff</h3>
-      <ReusableForm
-        fields={formFields}
-        onSubmit={handleSubmit}
-        formData={formData}
-        setFormData={setFormData}
-        submitButtonText="Add Staff"
-      />
-
-      <h3 className="section-title">Staff List</h3>
-      {isLoading ? (
-        <p className="loading-message">Loading...</p>
-      ) : (
-        <ReusableTable
-          columns={["name", "mobileNo", "address", "subjectExpert"]}
-          rows={staffData}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Staff Page
+      </Typography>
+      {error && (
+        <Typography color="error" gutterBottom>
+          {error}
+        </Typography>
       )}
-    </div>
+
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="name"
+          label="Name"
+          value={formData.name}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="mobileNo"
+          label="Mobile No."
+          value={formData.mobileNo}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          fullWidth
+          name="address"
+          label="Address"
+          value={formData.address}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="subjectExpert"
+          label="Subject Expertise"
+          value={formData.subjectExpert}
+          onChange={handleInputChange}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Add Staff
+        </Button>
+      </Box>
+
+      <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+        Staff List
+      </Typography>
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Mobile No.</TableCell>
+                <TableCell>Address</TableCell>
+                <TableCell>Subject Expertise</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {staffData.map((staff) => (
+                <TableRow key={staff.id}>
+                  <TableCell>{staff.name}</TableCell>
+                  <TableCell>{staff.mobileNo}</TableCell>
+                  <TableCell>{staff.address}</TableCell>
+                  <TableCell>{staff.subjectExpert}</TableCell>
+                  <TableCell>
+                    <Button onClick={() => handleEdit(staff.id, staff)}>
+                      Edit
+                    </Button>
+                    <Button onClick={() => handleDelete(staff.id)}>
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Container>
   );
 };
 

@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { fetchData, postData, updateData, deleteData } from "../service/api";
-import ReusableTable from "../components/ReusableTable";
-import ReusableForm from "../components/ReusableForm";
-import ErrorMessage from "../components/ErrorMessage";
-import "./styles/StudentPage.css";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  TextField,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  CircularProgress,
+} from "@mui/material";
 
 const StudentPage = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -57,9 +68,10 @@ const StudentPage = () => {
     }
   };
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await postData("students", data);
+      const response = await postData("students", formData);
       setStudentsData([...studentsData, response]);
       setFormData({
         firstName: "",
@@ -75,48 +87,130 @@ const StudentPage = () => {
     }
   };
 
-  const formFields = [
-    { name: "firstName", label: "First Name", required: true },
-    { name: "lastName", label: "Last Name", required: true },
-    { name: "mobileNo", label: "Mobile No.", required: true },
-    { name: "roleNo", label: "Role No.", required: true },
-    { name: "className", label: "Class Name", required: true },
-    { name: "address", label: "Address", required: true },
-  ];
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   return (
-    <div className="page-container">
-      <h2 className="page-title">Student Page</h2>
-      {error && <ErrorMessage message={error} />}
-
-      <h3 className="section-title">Add New Student</h3>
-      <ReusableForm
-        fields={formFields}
-        onSubmit={handleSubmit}
-        formData={formData}
-        setFormData={setFormData}
-        submitButtonText="Add Student"
-      />
-
-      <h3 className="section-title">Students List</h3>
-      {isLoading ? (
-        <p className="loading-message">Loading...</p>
-      ) : (
-        <ReusableTable
-          columns={[
-            "firstName",
-            "lastName",
-            "mobileNo",
-            "roleNo",
-            "className",
-            "address",
-          ]}
-          rows={studentsData}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+    <Container>
+      <Typography variant="h4" gutterBottom>
+        Student Page
+      </Typography>
+      {error && (
+        <Typography color="error" gutterBottom>
+          {error}
+        </Typography>
       )}
-    </div>
+
+      <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="firstName"
+          label="First Name"
+          value={formData.firstName}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="lastName"
+          label="Last Name"
+          value={formData.lastName}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="mobileNo"
+          label="Mobile No."
+          value={formData.mobileNo}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="roleNo"
+          label="Role No."
+          value={formData.roleNo}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="className"
+          label="Class Name"
+          value={formData.className}
+          onChange={handleInputChange}
+        />
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          name="address"
+          label="Address"
+          value={formData.address}
+          onChange={handleInputChange}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Add Student
+        </Button>
+      </Box>
+
+      <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
+        Students List
+      </Typography>
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>First Name</TableCell>
+                <TableCell>Last Name</TableCell>
+                <TableCell>Mobile No.</TableCell>
+                <TableCell>Role No.</TableCell>
+                <TableCell>Class Name</TableCell>
+                <TableCell>Address</TableCell>
+                <TableCell>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {studentsData.map((student) => (
+                <TableRow key={student.id}>
+                  <TableCell>{student.firstName}</TableCell>
+                  <TableCell>{student.lastName}</TableCell>
+                  <TableCell>{student.mobileNo}</TableCell>
+                  <TableCell>{student.roleNo}</TableCell>
+                  <TableCell>{student.className}</TableCell>
+                  <TableCell>{student.address}</TableCell>
+                  <TableCell>
+                    <Button onClick={() => handleEdit(student.id, student)}>
+                      Edit
+                    </Button>
+                    <Button onClick={() => handleDelete(student.id)}>
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Container>
   );
 };
 
